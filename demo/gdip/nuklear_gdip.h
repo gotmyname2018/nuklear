@@ -591,7 +591,7 @@ static void
 nk_gdip_draw_image(short x, short y, unsigned short w, unsigned short h,
     struct nk_image img, struct nk_color col)
 {
-    GpImage *image = img.handle.ptr;
+    GpImage *image = (GpImage*)img.handle.ptr;
     GdipDrawImageRectI(gdip.memory, image, x, y, w, h);
 }
 
@@ -638,7 +638,11 @@ nk_gdip_load_image_from_memory(const void *membuf, nk_uint membufSize)
         return nk_image_id(0);
     
     status = GdipLoadImageFromStream(stream, &image);
+#ifdef __cplusplus
+    stream->Release();
+#else
     stream->lpVtbl->Release(stream);
+#endif
 
     if (status)
         return nk_image_id(0);
@@ -651,7 +655,7 @@ nk_gdip_image_free(struct nk_image image)
 {
     if (!image.handle.ptr)
         return;
-    GdipDisposeImage(image.handle.ptr);
+    GdipDisposeImage((GpImage*)image.handle.ptr);
 }
 
 GdipFont*
