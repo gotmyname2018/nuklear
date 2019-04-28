@@ -254,7 +254,11 @@ nk_gdip_draw_image(short x, short y, unsigned short w, unsigned short h,
     struct nk_image img, struct nk_color col)
 {
     Image *image = (Image*)img.handle.ptr;
-    gdip->memory->DrawImage(image, x, y, w, h);
+    if (img.region[0] || img.region[1] || img.region[2] || img.region[3]) {
+      gdip->memory->DrawImage(image, Rect(x, y, w, h), img.region[0], img.region[1], img.region[2], img.region[3], UnitPixel);
+    } else {
+      gdip->memory->DrawImage(image, x, y, w, h);
+    }
 }
 
 static void
